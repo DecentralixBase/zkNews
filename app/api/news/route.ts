@@ -2,15 +2,13 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import { type NewsCategory } from "@/utils/fetchNews";
 
-const API_KEY = process.env.CRYPTOPANIC_API_KEY || "7e25097fcc0d603011578a3f243f16d2271d8199";
-
-// Map our categories to CryptoPanic's filters
+// Map categories to CoinGecko's categories
 const categoryToFilter: Record<NewsCategory, string> = {
   all: "",
   defi: "defi",
   nft: "nft",
-  tokens: "tokens",
-  airdrops: "airdrops",
+  tokens: "general",
+  airdrops: "general",
   regulations: "regulation"
 };
 
@@ -19,52 +17,38 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') as NewsCategory || 'all';
     
-    let apiUrl = `https://cryptopanic.com/api/v1/posts/?auth_token=${API_KEY}&public=true&kind=news&regions=en`;
+    // Using CoinGecko's free API for quick setup
+    let apiUrl = 'https://api.coingecko.com/api/v3/news';
     
     // Add category filter if not 'all'
     const filter = categoryToFilter[category];
     if (filter) {
-      apiUrl += `&currencies=${filter}`;
+      apiUrl += `?category=${filter}`;
     }
     
     const { data } = await axios.get(apiUrl);
     
-    if (!data.results || !Array.isArray(data.results)) {
+    if (!Array.isArray(data)) {
       console.error('Invalid API response:', data);
       throw new Error('Invalid API response format');
     }
 
-    const articles = data.results.map((item: any) => {
-      // Extract the first image URL from the metadata or use default
-      const imageUrl = item?.metadata?.image || 
-                      item?.metadata?.images?.[0] || 
-                      item?.metadata?.thumbnail ||
-                      "/default-news.png";
-
-      // Extract tags from both currencies and tags
-      const tags = [
-        ...(item.currencies || []).map((c: any) => c.code || c.title || ""),
-        ...(item.tags || []).map((t: any) => t.name || t.title || "")
-      ].filter(Boolean);
-
+    const articles = data.map((item: any) => {
       return {
-        thumbnail: imageUrl,
-        source: item.source?.title || item.domain || "CryptoPanic",
+        thumbnail: item.thumb_2x || item.thumb || "/default-news.png",
+        source: item.author || "CoinGecko",
         headline: item.title,
-        summary: item.metadata?.description || item.title,
+        summary: item.description || item.title,
         url: item.url,
-        tags: [...new Set(tags)], // Remove duplicates
-        publishedAt: item.published_at,
+        tags: [item.categories || "crypto"].flat().filter(Boolean),
+        publishedAt: item.created_at,
       };
     });
 
     return NextResponse.json({ articles });
   } catch (err) {
     console.error('News fetch error:', err);
-    const errorMessage = err instanceof Error ? err.message : "Failed to fetch news";
-    return NextResponse.json(
-      { articles: [], error: errorMessage }, 
-      { status: 500 }
-    );
+    // Return empty array on error to prevent UI breaking
+    return NextResponse.json({ articles: [] }, { status: 200 });
   }
 } 
