@@ -1,3 +1,4 @@
+"use client";
 import { Home, Layers, Bookmark, Settings, ChevronDown, Zap } from "lucide-react";
 import React, { useState } from "react";
 

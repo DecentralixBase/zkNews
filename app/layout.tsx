@@ -1,5 +1,5 @@
-import "@/styles/globals.css";
-import "@fontsource/inter/variable.css";
+import "../styles/globals.css";
+import "@fontsource/inter/index.css";
 import "@fontsource/poppins/latin-400.css";
 import type { Metadata } from "next";
 
