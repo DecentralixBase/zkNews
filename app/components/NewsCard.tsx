@@ -23,11 +23,11 @@ export default function NewsCard({
   onBookmark,
 }: NewsCardProps) {
   return (
-    <div className="glass flex gap-4 p-4 rounded-xl mb-4 hover:shadow-lg transition-shadow">
+    <div className="glass flex flex-col md:flex-row gap-4 p-3 sm:p-4 rounded-xl mb-4 hover:shadow-lg transition-shadow w-full">
       <img
         src={thumbnail}
         alt={headline}
-        className="w-24 h-24 object-cover rounded-lg border border-white/10"
+        className="w-full md:w-24 h-40 md:h-24 object-cover rounded-lg border border-white/10 mb-2 md:mb-0"
       />
       <div className="flex-1 flex flex-col justify-between">
         <div>
@@ -37,7 +37,7 @@ export default function NewsCard({
             </span>
             <span className="text-xs text-gray-400">• {timeAgo(publishedAt)}</span>
           </div>
-          <h3 className="font-poppins font-semibold text-lg text-white mb-1 line-clamp-2">
+          <h3 className="font-poppins font-semibold text-base sm:text-lg text-white mb-1 line-clamp-2">
             {headline}
           </h3>
           <p className="text-gray-300 text-sm line-clamp-2 mb-2">{summary}</p>
