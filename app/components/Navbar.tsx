@@ -1,12 +1,10 @@
 "use client";
-import { Home, Layers, Bookmark, Settings, ChevronDown, Zap, Menu, X, Coins, Gift, Scale } from "lucide-react";
+import { Home, Layers, ChevronDown, Zap, Menu, X, Coins, Gift, Scale } from "lucide-react";
 import React, { useState } from "react";
 import { type NewsCategory } from "@/utils/fetchNews";
 
 interface NavbarProps {
   onCategoryChange: (category: NewsCategory) => void;
-  onShowAuth: () => void;
-  onShowSettings: () => void;
   currentCategory: NewsCategory;
 }
 
@@ -19,22 +17,12 @@ const categories = [
   { name: "regulations" as const, label: "Regulations", icon: <Scale size={18} /> },
 ];
 
-export default function Navbar({ onCategoryChange, onShowAuth, onShowSettings, currentCategory }: NavbarProps) {
+export default function Navbar({ onCategoryChange, currentCategory }: NavbarProps) {
   const [showCategories, setShowCategories] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleCategoryClick = (category: NewsCategory) => {
     onCategoryChange(category);
-    setDrawerOpen(false);
-  };
-
-  const handleBookmarkClick = () => {
-    onShowAuth();
-    setDrawerOpen(false);
-  };
-
-  const handleSettingsClick = () => {
-    onShowSettings();
     setDrawerOpen(false);
   };
 
@@ -68,18 +56,6 @@ export default function Navbar({ onCategoryChange, onShowAuth, onShowSettings, c
             ))}
           </ul>
         )}
-      </li>
-      <li 
-        className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer"
-        onClick={handleBookmarkClick}
-      >
-        <Bookmark size={20} /> Bookmarked
-      </li>
-      <li 
-        className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer"
-        onClick={handleSettingsClick}
-      >
-        <Settings size={20} /> Settings
       </li>
     </ul>
   );

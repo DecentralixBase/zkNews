@@ -4,17 +4,14 @@ import Header from "./components/Header";
 import TrendingBar from "./components/TrendingBar";
 import NewsCard from "./components/NewsCard";
 import LoadingSkeleton from "./components/LoadingSkeleton";
-import AuthModal from "./components/AuthModal";
-import SettingsModal from "./components/SettingsModal";
 import { useEffect, useState } from "react";
 import { fetchNews, NewsArticle, NewsCategory } from "@/utils/fetchNews";
+import { Bookmark, Settings, LogIn } from "lucide-react";
 
 export default function HomePage() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAuth, setShowAuth] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<NewsCategory>('all');
 
   useEffect(() => {
@@ -35,36 +32,43 @@ export default function HomePage() {
     setCurrentCategory(category);
   };
 
-  const handleShowAuth = () => {
-    setShowAuth(true);
-  };
-
-  const handleShowSettings = () => {
-    setShowSettings(true);
-  };
-
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-gradient-start to-gradient-end">
       <Navbar 
-        onCategoryChange={handleCategoryChange} 
-        onShowAuth={handleShowAuth}
-        onShowSettings={handleShowSettings}
+        onCategoryChange={handleCategoryChange}
         currentCategory={currentCategory}
       />
       <div className="flex-1 flex flex-col md:ml-64">
-        <div className="flex items-center justify-end px-4 pt-4">
-          <button
-            onClick={() => setShowAuth(true)}
-            className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold shadow-glass text-sm"
-          >
-            Login / Signup
-          </button>
+        {/* Top Action Bar */}
+        <div className="flex items-center justify-between px-4 py-3 glass mt-2 mx-2 rounded-xl">
+          <div className="text-xl font-semibold text-white">zkNews</div>
+          <div className="flex items-center gap-3">
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+              onClick={() => window.location.href = '/bookmarks'}
+            >
+              <Bookmark size={20} />
+              <span className="hidden sm:inline">Bookmarks</span>
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+              onClick={() => window.location.href = '/settings'}
+            >
+              <Settings size={20} />
+              <span className="hidden sm:inline">Settings</span>
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold"
+              onClick={() => window.location.href = '/login'}
+            >
+              <LogIn size={20} />
+              <span className="hidden sm:inline">Login / Signup</span>
+            </button>
+          </div>
         </div>
         <Header hideWalletConnect />
         <TrendingBar />
         <main className="flex-1 p-2 sm:p-4 md:p-8 glass mt-4 mx-0 sm:mx-2 md:mx-8 max-w-3xl w-full mx-auto">
-          <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
-          <SettingsModal open={showSettings} onClose={() => setShowSettings(false)} />
           {loading && (
             <>
               <LoadingSkeleton />
@@ -81,7 +85,7 @@ export default function HomePage() {
               key={article.url}
               {...article}
               bookmarked={false}
-              onBookmark={() => setShowAuth(true)}
+              onBookmark={() => window.location.href = '/login'}
             />
           ))}
         </main>
