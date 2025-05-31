@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import { type NewsCategory } from "@/utils/fetchNews";
 
-// Map categories to CoinGecko's categories
+// Map categories to Cryptopanic filters
 const categoryToFilter: Record<NewsCategory, string> = {
   all: "",
   defi: "defi",
   nft: "nft",
-  tokens: "general",
-  airdrops: "general",
+  tokens: "tokens",
+  airdrops: "mining",
   regulations: "regulation"
 };
 
@@ -17,31 +17,37 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') as NewsCategory || 'all';
     
-    // Using CoinGecko's free API for quick setup
-    let apiUrl = 'https://api.coingecko.com/api/v3/news';
+    // Using Cryptopanic's free API
+    let apiUrl = 'https://cryptopanic.com/api/v1/posts/?auth_token=cd529b9e4a3dfa8fb6e2a3c97894a2d5f5d6685f&public=true';
     
     // Add category filter if not 'all'
     const filter = categoryToFilter[category];
     if (filter) {
-      apiUrl += `?category=${filter}`;
+      apiUrl += `&currencies=${filter}`;
     }
     
     const { data } = await axios.get(apiUrl);
     
-    if (!Array.isArray(data)) {
+    if (!data?.results || !Array.isArray(data.results)) {
       console.error('Invalid API response:', data);
       throw new Error('Invalid API response format');
     }
 
-    const articles = data.map((item: any) => {
+    const articles = data.results.map((item: any) => {
+      // Extract the first image URL from the metadata or use default
+      const imageUrl = item?.metadata?.image || 
+                      item?.metadata?.images?.[0] || 
+                      item?.metadata?.thumbnail ||
+                      "/default-news.png";
+
       return {
-        thumbnail: item.thumb_2x || item.thumb || "/default-news.png",
-        source: item.author || "CoinGecko",
+        thumbnail: imageUrl,
+        source: item.source?.title || item.domain || "Cryptopanic",
         headline: item.title,
-        summary: item.description || item.title,
+        summary: item.metadata?.description || item.title,
         url: item.url,
-        tags: [item.categories || "crypto"].flat().filter(Boolean),
-        publishedAt: item.created_at,
+        tags: [(item.currencies || []).map((c: any) => c.code), category].flat().filter(Boolean),
+        publishedAt: item.published_at,
       };
     });
 
