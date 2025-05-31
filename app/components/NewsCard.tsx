@@ -1,5 +1,7 @@
-import { Bookmark, BookMarked } from "lucide-react";
+import { Bookmark, BookMarked, Image as ImageIcon } from "lucide-react";
 import { timeAgo } from "@/utils/timeAgo";
+import Image from "next/image";
+import { useState } from "react";
 
 interface NewsCardProps {
   thumbnail: string;
@@ -22,13 +24,30 @@ export default function NewsCard({
   bookmarked,
   onBookmark,
 }: NewsCardProps) {
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <div className="glass flex flex-col md:flex-row gap-4 p-3 sm:p-4 rounded-xl mb-4 hover:shadow-lg transition-shadow w-full">
-      <img
-        src={thumbnail}
-        alt={headline}
-        className="w-full md:w-24 h-40 md:h-24 object-cover rounded-lg border border-white/10 mb-2 md:mb-0"
-      />
+      <div className="relative w-full md:w-24 h-40 md:h-24 rounded-lg border border-white/10 mb-2 md:mb-0 overflow-hidden">
+        {imageError ? (
+          <div className="w-full h-full flex items-center justify-center bg-white/5">
+            <ImageIcon size={24} className="text-gray-400" />
+          </div>
+        ) : (
+          <Image
+            src={thumbnail}
+            alt={headline}
+            fill
+            className="object-cover"
+            onError={handleImageError}
+            sizes="(max-width: 768px) 100vw, 96px"
+          />
+        )}
+      </div>
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
