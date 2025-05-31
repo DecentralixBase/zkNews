@@ -1,6 +1,10 @@
-import { Search, Globe, Wallet } from "lucide-react";
+import { Search, Globe } from "lucide-react";
 
-export default function Header() {
+interface HeaderProps {
+  hideWalletConnect?: boolean;
+}
+
+export default function Header({ hideWalletConnect }: HeaderProps) {
   return (
     <header className="w-full flex items-center justify-between glass px-4 py-3 mt-2 md:mt-4">
       <div className="flex items-center gap-2 w-full max-w-md">
@@ -18,9 +22,7 @@ export default function Header() {
           </button>
           {/* Language dropdown (future) */}
         </div>
-        <button className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold shadow-glass">
-          <Wallet size={18} /> Connect Wallet
-        </button>
+        {/* Wallet connect button removed */}
       </div>
     </header>
   );
