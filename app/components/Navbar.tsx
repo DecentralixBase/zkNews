@@ -1,22 +1,49 @@
 "use client";
-import { Home, Layers, Bookmark, Settings, ChevronDown, Zap, Menu, X } from "lucide-react";
+import { Home, Layers, Bookmark, Settings, ChevronDown, Zap, Menu, X, Coins, Gift, Scale } from "lucide-react";
 import React, { useState } from "react";
+import { type NewsCategory } from "@/utils/fetchNews";
+
+interface NavbarProps {
+  onCategoryChange: (category: NewsCategory) => void;
+  onShowAuth: () => void;
+  onShowSettings: () => void;
+  currentCategory: NewsCategory;
+}
 
 const categories = [
-  { name: "DeFi", icon: <Zap size={18} /> },
-  { name: "NFTs", icon: <Layers size={18} /> },
-  { name: "Tokens", icon: <Layers size={18} /> },
-  { name: "Airdrops", icon: <Layers size={18} /> },
-  { name: "Regulations", icon: <Layers size={18} /> },
+  { name: "all" as const, label: "All News", icon: <Layers size={18} /> },
+  { name: "defi" as const, label: "DeFi", icon: <Zap size={18} /> },
+  { name: "nft" as const, label: "NFTs", icon: <Layers size={18} /> },
+  { name: "tokens" as const, label: "Tokens", icon: <Coins size={18} /> },
+  { name: "airdrops" as const, label: "Airdrops", icon: <Gift size={18} /> },
+  { name: "regulations" as const, label: "Regulations", icon: <Scale size={18} /> },
 ];
 
-export default function Navbar() {
+export default function Navbar({ onCategoryChange, onShowAuth, onShowSettings, currentCategory }: NavbarProps) {
   const [showCategories, setShowCategories] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const handleCategoryClick = (category: NewsCategory) => {
+    onCategoryChange(category);
+    setDrawerOpen(false);
+  };
+
+  const handleBookmarkClick = () => {
+    onShowAuth();
+    setDrawerOpen(false);
+  };
+
+  const handleSettingsClick = () => {
+    onShowSettings();
+    setDrawerOpen(false);
+  };
+
   const navLinks = (
     <ul className="space-y-2">
-      <li className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer">
+      <li 
+        className={`flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer ${currentCategory === 'all' ? 'bg-white/20' : ''}`}
+        onClick={() => handleCategoryClick('all')}
+      >
         <Home size={20} /> Home
       </li>
       <li>
@@ -30,18 +57,28 @@ export default function Navbar() {
         </div>
         {showCategories && (
           <ul className="ml-7 mt-1 space-y-1">
-            {categories.map((cat) => (
-              <li key={cat.name} className="flex items-center gap-2 p-1 rounded hover:bg-white/10 cursor-pointer text-sm">
-                {cat.icon} {cat.name}
+            {categories.slice(1).map((cat) => (
+              <li 
+                key={cat.name} 
+                className={`flex items-center gap-2 p-1 rounded hover:bg-white/10 cursor-pointer text-sm ${currentCategory === cat.name ? 'bg-white/20' : ''}`}
+                onClick={() => handleCategoryClick(cat.name)}
+              >
+                {cat.icon} {cat.label}
               </li>
             ))}
           </ul>
         )}
       </li>
-      <li className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer">
+      <li 
+        className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer"
+        onClick={handleBookmarkClick}
+      >
         <Bookmark size={20} /> Bookmarked
       </li>
-      <li className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer">
+      <li 
+        className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer"
+        onClick={handleSettingsClick}
+      >
         <Settings size={20} /> Settings
       </li>
     </ul>
